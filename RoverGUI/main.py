@@ -7,8 +7,9 @@ class App(tk.Tk):
 
     def __init__(self):
         super().__init__()
+        self.title('RoverGUI')
         self.styler = ttk.Style()
-        self.styler.theme_use('clam')
+        self.make_style('gray21', 'snow', 'helvetica 20')
         self.event = namedtuple('event', ['keysym'])
         self.ON_OFF = tk.StringVar(value="OFF")
         self.AUTO = tk.StringVar(value="MANUAL")
@@ -21,6 +22,23 @@ class App(tk.Tk):
         self.Y_CORD = tk.StringVar(value='Y: 100.0')
         self.make_window()
         self.key_binding()
+
+    def make_style(self, bg: str, fg: str, ft: str = 'helvetica 21'):
+        self.styler.theme_use('clam')
+        self.styler.configure('TFrame', background='grey21')
+        self.styler.configure('TProgressbar', background='green3',
+                              padding=0)
+        self.styler.configure('TButton', font=ft,
+                              background=bg, foreground=fg)
+        self.styler.configure('TLabel', font=ft,
+                              foreground=fg, background=bg)
+        self.styler.configure('HEADER.TLabel', font=ft,
+                              foreground='coral1', background='grey21')
+        self.styler.configure('SPEED.TLabel', font='helvetica 40')
+        self.styler.configure('ON_OFF.TButton', background='red2',
+                              font='helvetica 24')
+        self.styler.configure('AUTO.TButton', font=ft,
+                              background='grey21', foreground='snow')
 
     def make_window(self):
         mainframe = ttk.Frame(self)
@@ -45,7 +63,8 @@ class App(tk.Tk):
 
     def make_on_off(self, root):
         on_off_button = ttk.Button(root, textvariable=self.ON_OFF,
-                                   command=self.switch_on_off)
+                                   command=self.switch_on_off,
+                                   style='ON_OFF.TButton')
         on_off_button.grid(row=0, rowspan=2, column=2,
                            padx=1, pady=2, sticky='nsew')
 
@@ -54,46 +73,59 @@ class App(tk.Tk):
         if status == 'OFF':
             event = self.event('ROVER ON')
             self.ON_OFF.set('ON')
+            self.make_style('gray21', 'gray25')
+            self.styler.configure('ON_OFF.TButton', background='green3')
         else:
             event = self.event('ROVER OFF')
+            self.AUTO.set('MANUAL')
             self.ON_OFF.set('OFF')
+            self.styler.configure('ON_OFF.TButton', background='red')
+            self.make_style('gray21', 'snow')
         self._callback(event)
 
     def make_auto(self, root):
         auto_button = ttk.Button(root, textvariable=self.AUTO,
-                                 command=self.switch_auto)
+                                 command=self.switch_auto,
+                                 style='AUTO.TButton')
         auto_button.grid(row=0, rowspan=2, column=1,
                          padx=1, pady=2, sticky='nsew')
 
     def switch_auto(self):
+        if self.ON_OFF.get() == "OFF":
+            self.switch_on_off()
         status = self.AUTO.get()
         if status == "MANUAL":
             event = self.event("MODE MANUAL")
             self.AUTO.set("AUTO")
+            self.make_style('purple', 'thistle1', 'helvetica 20')
         else:
             event = self.event("MODE AUTO")
             self.AUTO.set("MANUAL")
+            self.make_style('gray21', 'snow', 'helvetica 20')
         self._callback(event)
 
     def make_rudra_label(self, root):
         rudra_label = ttk.Label(root, text=self.HEADING.get(),
-                                anchor='center')
+                                anchor='center', style='HEADER.TLabel')
         rudra_label.grid(row=0, column=0, sticky='nsew')
 
     def make_battery(self, root):
         battery_bar = ttk.Progressbar(root, variable=self.BATTERY,
                                       mode='determinate', orient='horizontal')
         battery_bar.grid(row=2, column=1, columnspan=2,
-                         padx=2, pady=2, sticky='nsew')
+                         padx=0, pady=0, sticky='nsew')
 
     def make_speed(self, root):
         speed_val = ttk.Label(root, textvariable=self.SPEED,
-                              anchor='center', justify='center')
+                              anchor='center', justify='center',
+                              style='SPEED.TLabel')
         speed_val.grid(row=3, rowspan=2, column=2,
                        padx=2, pady=2, sticky='nsew')
 
     def make_log_screen(self, root):
-        log_screen = tk.Listbox(root, listvariable=self.LOG)
+        log_screen = tk.Listbox(root, listvariable=self.LOG,
+                                background='gray21', foreground='snow',
+                                font='helvetica 12')
         log_screen.grid(row=2, rowspan=4, column=0,
                         padx=2, pady=2, sticky='nsew')
 

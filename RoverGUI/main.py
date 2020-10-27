@@ -9,12 +9,12 @@ class App(tk.Tk):
         super().__init__()
         self.title('RoverGUI')
         self.styler = ttk.Style()
-        self.make_style('gray21', 'snow', 'helvetica 20')
+        self.make_style('gray21', 'gray25', 'helvetica 20')
         self.event = namedtuple('event', ['keysym'])
-        self.ON_OFF = tk.StringVar(value="OFF")
+        self.ON_OFF = tk.StringVar(value="ON")
         self.AUTO = tk.StringVar(value="MANUAL")
         self.HEADING = tk.StringVar(value='rudra')
-        self.BATTERY = tk.IntVar(value=75)
+        self.BATTERY = tk.IntVar(value=0)
         self.SPEED = tk.StringVar(value='0.0\nkm/h')
         self.LOG_ENTRY = ["rover initiated..."]
         self.LOG = tk.StringVar(value=self.LOG_ENTRY)
@@ -26,7 +26,7 @@ class App(tk.Tk):
     def make_style(self, bg: str, fg: str, ft: str = 'helvetica 21'):
         self.styler.theme_use('clam')
         self.styler.configure('TFrame', background='grey21')
-        self.styler.configure('TProgressbar', background='green3',
+        self.styler.configure('TProgressbar', background='OliveDrab3',
                               padding=0)
         self.styler.configure('TButton', font=ft,
                               background=bg, foreground=fg)
@@ -35,10 +35,10 @@ class App(tk.Tk):
         self.styler.configure('HEADER.TLabel', font=ft,
                               foreground='coral1', background='grey21')
         self.styler.configure('SPEED.TLabel', font='helvetica 40')
-        self.styler.configure('ON_OFF.TButton', background='red2',
+        self.styler.configure('ON_OFF.TButton', background='green3',
                               font='helvetica 24')
         self.styler.configure('AUTO.TButton', font=ft,
-                              background='grey21', foreground='snow')
+                              background='grey21', foreground=fg)
 
     def make_window(self):
         mainframe = ttk.Frame(self)
@@ -73,14 +73,16 @@ class App(tk.Tk):
         if status == 'OFF':
             event = self.event('ROVER ON')
             self.ON_OFF.set('ON')
+            self.BATTERY.set(0)
             self.make_style('gray21', 'gray25')
             self.styler.configure('ON_OFF.TButton', background='green3')
         else:
             event = self.event('ROVER OFF')
             self.AUTO.set('MANUAL')
             self.ON_OFF.set('OFF')
-            self.styler.configure('ON_OFF.TButton', background='red')
+            self.BATTERY.set(90)
             self.make_style('gray21', 'snow')
+            self.styler.configure('ON_OFF.TButton', background='red')
         self._callback(event)
 
     def make_auto(self, root):
@@ -144,7 +146,7 @@ class App(tk.Tk):
 
     def _callback(self, event):
         keysym = event.keysym
-        update = [f"COMMAND: {keysym}"]
+        update = [f"cmd: {keysym}"]
         self.LOG_ENTRY.insert(0, update)
         self.LOG.set(self.LOG_ENTRY)
 
